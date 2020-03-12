@@ -14,29 +14,32 @@ def create_app(test_config=None):
   setup_db(app)
   cors = CORS(app, resources={r"/api/*": {"origins" : "*" }})
   
-  
-@app.after_request
-def after_request(response):
-  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-  response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
-  return response  
-'''  
-@app.route('/')
-def index():
-  return jsonify({'message' : 'Heya'})
-'''
+    
+  @app.after_request
+  def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
+    return response  
+  '''  
+  @app.route('/')
+  def index():
+    return jsonify({'message' : 'Heya'})
+  '''
 
-@app.route('/questions', methods=['GET', 'POST'])
-@cross_origin()
-def get_questions():
-  if request.method == 'POST':
-    return 'Creating Questions' #create_question()
-  else:
-    return 'GETTING Questions'
-  
-@app.route('/questions/<int:question_id>')
-def get_question(question_id):
-  return 'Question %d' % question_id
+  @app.route('/questions', methods=['GET', 'POST'])
+  @cross_origin()
+  def get_questions():
+    if request.method == 'POST':
+      return jsonify({
+        
+        'Creating Questions' #create_question()
+      })
+    else:
+      return 'GETTING Questions'
+    
+  @app.route('/questions/<int:question_id>')
+  def get_question(question_id):
+    return 'Question %d' % question_id
 
   
   '''
@@ -117,39 +120,41 @@ def get_question(question_id):
   including 404 and 422. 
   '''
   
-  return app
+
 
 # =================================================================
 #  Error Handlers
 # =================================================================
 
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template('errors/404.html'), 404
+  @app.errorhandler(404)
+  def not_found_error(error):
+      return render_template('errors/404.html'), 404
 
 
-@app.errorhandler(500)
-def server_error(error):
-    return render_template('errors/500.html'), 500
+  @app.errorhandler(500)
+  def server_error(error):
+      return render_template('errors/500.html'), 500
 
 
-if not app.debug:
-    file_handler = FileHandler('error.log')
-    file_handler.setFormatter(
-        Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-    )
-    app.logger.setLevel(logging.INFO)
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
-    app.logger.info('errors')
+  if not app.debug:
+      file_handler = FileHandler('error.log')
+      file_handler.setFormatter(
+          Formatter(
+              '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+      )
+      app.logger.setLevel(logging.INFO)
+      file_handler.setLevel(logging.INFO)
+      app.logger.addHandler(file_handler)
+      app.logger.info('errors')
 
-#----------------------------------------------------------------------------#
-# Launch.
-#----------------------------------------------------------------------------#
+  #----------------------------------------------------------------------------#
+  # Launch.
+  #----------------------------------------------------------------------------#
 
-# Default port:
-if __name__ == '__main__':
-    app.run()
+  # Default port:
+  if __name__ == '__main__':
+      app.run()
 
-# Or specify port manually:
+  # Or specify port manually:
+
+  return app
