@@ -27,8 +27,20 @@ def create_app(test_config=None):
   '''
 
   @app.route('/questions', methods=['GET', 'POST'])
-  @cross_origin()
+  #@cross_origin()
   def get_questions():
+    page = request.args.get('page', 1, type=int)
+    start = (page - 1) * 10
+    end = start + 10
+    questions = Question.query.all()
+    formatted_questions = [question.format() for question in questions]
+    
+    return jsonify({  
+        'success':True,
+        'questions': formatted_questions[start:end],
+        'total_questions': len(formatted_questions),
+      })
+    '''
     if request.method == 'POST':
       return jsonify({
         
@@ -36,10 +48,23 @@ def create_app(test_config=None):
       })
     else:
       return 'GETTING Questions'
-    
+    '''
+
   @app.route('/questions/<int:question_id>')
   def get_question(question_id):
-    return 'Question %d' % question_id
+    question = Question.query.filter(Question.id == question_id).one_or_none()
+    
+    if question is None:
+      abort(404)
+    
+    else:
+      return jsonify({
+        'success': True,
+        'question': question.format(),
+      })
+  
+  
+    #return 'Question %d' % question_id
 
   
   '''
@@ -128,25 +153,10 @@ def create_app(test_config=None):
 
   @app.errorhandler(404)
   def not_found_error(error):
-      return render_template('errors/404.html'), 404
-
-
-  @app.errorhandler(500)
-  def server_error(error):
-      return render_template('errors/500.html'), 500
-
-
-  if not app.debug:
-      file_handler = FileHandler('error.log')
-      file_handler.setFormatter(
-          Formatter(
-              '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-      )
-      app.logger.setLevel(logging.INFO)
-      file_handler.setLevel(logging.INFO)
-      app.logger.addHandler(file_handler)
-      app.logger.info('errors')
-
+    return jsonify({  
+        'success':False,
+        'item': 'Not Found'
+    })
   #----------------------------------------------------------------------------#
   # Launch.
   #----------------------------------------------------------------------------#
