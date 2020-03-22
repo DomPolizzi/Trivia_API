@@ -36,7 +36,9 @@ def create_app(test_config=None):
   def index():
     return jsonify({'message' : 'Heya'})
   '''
-
+  #-------------
+  #Get Request
+  #-------------
   @app.route('/questions')
   #@cross_origin()
   def retrieve_questions():
@@ -76,6 +78,9 @@ def create_app(test_config=None):
       })
   
     #return 'Question %d' % question_id
+  #-------------
+  #Patch Request
+  #-------------
     
   @app.route('/questions/<int:question_id>', methods=['PATCH'])
   def update_question(question_id):
@@ -90,6 +95,12 @@ def create_app(test_config=None):
       if 'category' in body:
         question.category = int(body.get('category'))
 
+      if 'difficulty' in body:
+        question.category = int(body.get('difficulty'))
+
+      if 'answer' in body:
+        question.category = int(body.get('answer'))
+
       question.update()
 
       return jsonify({
@@ -100,6 +111,10 @@ def create_app(test_config=None):
     except:
       abort(400)
   
+  #-------------
+  #DELETE Request
+  #-------------
+
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
     try:
@@ -131,20 +146,32 @@ def create_app(test_config=None):
     new_answer = body.get('answer', None)
     new_category = body.get('category', None)
     new_difficulty = body.get('difficulty', None)
+    search = body.get('search', None)
 
     try:
-      question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
-      question.insert()
+      if search:
+        selection = Question.query.order_by(Question.id).filter(Question.title.ilite('%{}%'.format(search)))
+        current_questions = paginate_questions(request, selection)
 
-      selection = Question.query.order_by(Question.id).all()
-      current_questions = paginate_questions(request, selection)
+        return jsonify({
+          'success': True,
+          'questions': current_questions,
+          'total_questions': len(selection.all())
+        })
 
-      return jsonify({
-        'success': True,
-        'created': Question.id,
-        'questions': current_questions,
-        'total_questions': len(Question.query.all())
-      })
+      else:
+        question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+        question.insert()
+
+        selection = Question.query.order_by(Question.id).all()
+        current_questions = paginate_questions(request, selection)
+
+        return jsonify({
+          'success': True,
+          'created': Question.id,
+          'questions': current_questions,
+          'total_questions': len(Question.query.all())
+        })
 
     except:
       abort(422)
@@ -158,7 +185,7 @@ def create_app(test_config=None):
     return jsonify({
       "success": False,
       "error": 404,
-      "message": "Not found"
+      "message": "not found"
     }), 404
 
   @app.errorhandler(422)
@@ -166,8 +193,24 @@ def create_app(test_config=None):
     return jsonify({
       "success": False,
       "error": 422,
-      "message": "Unprocessable entity"
+      "message": "unprocessable "
     }), 422
+
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      "success": False,
+      "error": 400,
+      "message": "bad request"
+    }), 400
+  
+  @app.errorhandler(405)
+  def not_allowed(error):
+    return jsonify({
+      "success": False,
+      "error": 405,
+      "message": "not allowed"
+    }), 405
 
   return app
 
