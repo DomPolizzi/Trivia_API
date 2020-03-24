@@ -8,6 +8,8 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+
+# Paginiation of questions
 def paginate_questions(request, selection):
   page = request.args.get('page', 1, type=int)
   start = (page - 1) * QUESTIONS_PER_PAGE
@@ -18,13 +20,15 @@ def paginate_questions(request, selection):
 
   return current_questions
 
+# Create and define application structure
+
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
   setup_db(app)
-  cors = CORS(app, resources={r"/api/*": {"origins" : "*" }})
-  # CORS(app)
-    
+  cors = CORS(app, resources={'/': {"origins" : "*" }})
+  
+
   @app.after_request
   def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
@@ -37,13 +41,21 @@ def create_app(test_config=None):
     return jsonify({'message' : 'Heya'})
   '''
   #-------------
-  #Get Request
+  #Get Requests for Questions and Categories
   #-------------
+
   @app.route('/questions')
-  #@cross_origin()
   def retrieve_questions():
-    selection = Question.query.order_by(Question.id).all()
+    selection = Question.query.all()
+    # print("selection =", selection)
     current_questions = paginate_questions(request, selection)
+    # print('current question: ', current_questions)
+    total_questions = len(selection)
+   # print('total Qs : ', total_questions)
+
+    categories = Category.query.all()
+    categories_data= {}
+
 
     if len(current_questions) == 0:
       abort(404)
@@ -53,16 +65,25 @@ def create_app(test_config=None):
         'questions': current_questions,
         'total_questions': len(Question.query.all())
       })
+
     
-    '''
-    if request.method == 'POST':
-      return jsonify({
-        
-        'Creating Questions' #create_question()
-      })
-    else:
-      return 'GETTING Questions'
-    '''
+  @app.route('/categories')
+  def retrieve_categories():
+    categories = Category.query.all()
+    categories_data= {}
+    
+    for category in categories:
+      categories_data[category.id] = category.type
+
+    if len(categories_data) == 0:
+      abort(404)
+
+    return jsonify({
+      'success': True,
+      'categories': category_data
+    })
+  
+  
 
   @app.route('/questions/<int:question_id>')
   def get_question(question_id):
