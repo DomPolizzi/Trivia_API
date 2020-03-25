@@ -45,15 +45,14 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
     return response  
   
-  '''  
-  @app.route('/')
-  def index():
-    return jsonify({'message' : 'Heya'})
-  '''
+
   #-------------
-  #Get Requests for Questions and Categories
+  #Get Requests for Questions, Categories, and Quizes
   #-------------
   
+  #===================
+  #==== Questions ====
+  #===================
 
   @app.route('/questions')
   def retrieve_questions():
@@ -64,7 +63,7 @@ def create_app(test_config=None):
     total_questions = len(selection)
    # print('total Qs : ', total_questions)
 
-    categories = Category.query.all()
+    # categories = Category.query.all()
     categories_data= {}
 
 
@@ -77,7 +76,10 @@ def create_app(test_config=None):
         'total_questions': total_questions,
         'categories': categories_data
       })
-
+  
+  #===================
+  #=== Categories ====
+  #===================
     
   @app.route('/categories')
   def retrieve_categories():
@@ -94,25 +96,54 @@ def create_app(test_config=None):
       'success': True,
       'categories': categories_data
     })
-  
-  
 
-  @app.route('/questions/<int:question_id>')
-  def get_question(question_id):
-    question = Question.query.filter(Question.id == question_id).one_or_none()
-    
-    if question is None:
-      abort(404)
+  #----------------------------
+  # GET  Question by Category
+  #----------------------------
+
+  @app.route('/categories/<int:category_id>/question')
+  def get_questions_by_categories(category_id):
+    category = Category.query.filter(Category.id == category_id).one_or_none()
+    selection = Question.query.filter(Question.id == question_id).one_or_none()
+    current_questions = paginate_questions(request, selection)
+    total_questions = len(selection)
+
+    if category is None:
+      print('error')
+      abort(400)
     
     else:
+      print('success')
       return jsonify({
         'success': True,
-        'question': question.format()
+        'question': current_questions,
+        'total_questions': total_questions,
+        'category': category.type
       })
-  
-  #-------------
-  # POST Requests for Questions and Categories
-  #-------------
+  #CATEGORIES IS NOT YET BEING CORECTLY CALLED FOR!
+
+  #===================
+  #===== Quizzes =====
+  #===================
+  '''
+  @app.route('/quizzes')
+  def get_quizes():
+    selection = Category.query.all()
+    categiry_data = {}
+
+   if len(categories_data) == 0:
+      abort(404)
+
+    return jsonify({
+      'success': True,
+      'categories': categories_data
+    })
+  '''
+  # SIDE NOTE: Enabling breaks, Quizzes needs to call from categories
+
+  #----------------------------
+  # POST Requests for Questions
+  #----------------------------
 
   @app.route('/questions', methods=['POST'])
   def create_question():
@@ -167,7 +198,7 @@ def create_app(test_config=None):
   #-------------
   #Patch Request
   #-------------
-    
+  '''  
   @app.route('/questions/<int:question_id>', methods=['PATCH'])
   def update_question(question_id):
 
@@ -196,9 +227,9 @@ def create_app(test_config=None):
 
     except:
       abort(400)
-  
+  '''
   #-------------
-  #DELETE Request
+  #DELETE Question
   #-------------
 
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
