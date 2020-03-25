@@ -1,5 +1,15 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import (
+    Flask,
+    abort,
+    jsonify,
+    render_template,
+    request,
+    Response, 
+    flash, 
+    redirect, 
+    url_for
+)
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
@@ -43,6 +53,7 @@ def create_app(test_config=None):
   #-------------
   #Get Requests for Questions and Categories
   #-------------
+  
 
   @app.route('/questions')
   def retrieve_questions():
@@ -81,7 +92,7 @@ def create_app(test_config=None):
 
     return jsonify({
       'success': True,
-      'categories': category_data
+      'categories': categories_data
     })
   
   
@@ -99,7 +110,60 @@ def create_app(test_config=None):
         'question': question.format()
       })
   
-    #return 'Question %d' % question_id
+  #-------------
+  # POST Requests for Questions and Categories
+  #-------------
+
+  @app.route('/questions', methods=['POST'])
+  def create_question():
+  
+    body = request.get_json()
+    print('body', body)
+
+    new_question = body.get('question', None)
+    new_answer = body.get('answer', None)
+    new_category = body.get('category', None)
+    new_difficulty = body.get('difficulty', None)
+    search = body.get('search', None)
+
+    try:
+      if search:
+        selection = Question.query.order_by(Question.id).filter(Question.title.ilite('%{}%'.format(search)))
+        current_questions = paginate_questions(request, selection)
+
+       
+        return jsonify({
+          'success': True,
+          'questions': current_questions,
+          'total_questions': len(selection.all())
+        })
+
+      else:
+        question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+        question.insert()
+
+        selection = Question.query.order_by(Question.id).all()
+        current_questions = paginate_questions(request, selection)
+        print('here2')
+        created_id = question.id
+
+        total_questions = len(Question.query.all())
+
+        print("Current questions", current_questions, type(current_questions))
+        print("Total questions", total_questions, type(total_questions))
+        print("Created ID",  created_id, type(created_id))
+
+        return jsonify({
+          "success": True,
+          "created": created_id,
+          "questions": current_questions,
+          "total_questions": total_questions
+        })
+
+    except:
+      print('abort')
+      abort(422)
+
   #-------------
   #Patch Request
   #-------------
@@ -138,65 +202,31 @@ def create_app(test_config=None):
   #-------------
 
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
-  def delete_question(question_id):
+  def delete_question(question_id):      
     try:
       question = Question.query.filter(Question.id == question_id).one_or_none()
 
       if question is None:
         abort(404)
 
-      question.delete()
-      selection = Question.query.order_by(Book.id).all()
-      current_questions = paginate_questions(request, selection)
-
-      return jsonify({
-        'success': True,
-        'deleted': question_id,
-        'questions': current_questions,
-        'total_questions': len(Question.query.all())
-      })
-
-    except:
-      abort(422)
-
-  
-  @app.route('/questions', methods=['POST'])
-  def create_question():
-    body = request.get_json()
-
-    new_question = body.get('question', None)
-    new_answer = body.get('answer', None)
-    new_category = body.get('category', None)
-    new_difficulty = body.get('difficulty', None)
-    search = body.get('search', None)
-
-    try:
-      if search:
-        selection = Question.query.order_by(Question.id).filter(Question.title.ilite('%{}%'.format(search)))
-        current_questions = paginate_questions(request, selection)
-
-        return jsonify({
-          'success': True,
-          'questions': current_questions,
-          'total_questions': len(selection.all())
-        })
-
       else:
-        question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
-        question.insert()
-
+        question.delete()
         selection = Question.query.order_by(Question.id).all()
         current_questions = paginate_questions(request, selection)
+        created_id = question.id
 
+        total_questions = len(Question.query.all())
+        
         return jsonify({
           'success': True,
-          'created': Question.id,
-          'questions': current_questions,
-          'total_questions': len(Question.query.all())
+          'deleted': created_id,
+          'question': current_questions,
+          'total_questions': total_questions
         })
-
+          
     except:
       abort(422)
+
 
 # =================================================================
 #  Error Handlers
