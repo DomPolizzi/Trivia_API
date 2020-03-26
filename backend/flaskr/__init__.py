@@ -64,7 +64,11 @@ def create_app(test_config=None):
    # print('total Qs : ', total_questions)
 
     # categories = Category.query.all()
+    categories = Category.query.all()
     categories_data= {}
+    
+    for category in categories:
+      categories_data[category.id] = category.type
 
 
     if len(current_questions) == 0:
@@ -90,6 +94,7 @@ def create_app(test_config=None):
       categories_data[category.id] = category.type
 
     if len(categories_data) == 0:
+      print('error in Categories: ')
       abort(404)
 
     return jsonify({
@@ -101,13 +106,13 @@ def create_app(test_config=None):
   # GET  Question by Category
   #----------------------------
 
-  @app.route('/categories/<int:category_id>/question')
+  @app.route('/categories/<int:category_id>/questions')
   def get_questions_by_categories(category_id):
     category = Category.query.filter(Category.id == category_id).one_or_none()
-    selection = Question.query.filter(Question.id == question_id).one_or_none()
+    selection = Question.query.filter(Question.category == category_id).all()
     current_questions = paginate_questions(request, selection)
     total_questions = len(selection)
-
+    
     if category is None:
       print('error')
       abort(400)
