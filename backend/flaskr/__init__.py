@@ -107,8 +107,8 @@ def create_app(test_config=None):
   # GET  Question by Category
   #----------------------------
 
-  @app.route('/categories/<int:category_id>/questions')
-  def get_questions_by_categories(category_id):
+  @app.route('/categories/<int:id>/questions')
+  def get_questions_by_categories(id):
     category = Category.query.filter_by(id = id).one_or_none()
 
     if category is None:
