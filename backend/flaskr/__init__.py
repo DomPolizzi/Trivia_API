@@ -56,6 +56,7 @@ def create_app(test_config=None):
 
   @app.route('/questions')
   def retrieve_questions():
+    
     selection = Question.query.all()
     # print("selection =", selection)
     current_questions = paginate_questions(request, selection)
@@ -65,7 +66,7 @@ def create_app(test_config=None):
 
     # categories = Category.query.all()
     categories = Category.query.all()
-    categories_data= {}
+    categories_data = {}
     
     for category in categories:
       categories_data[category.id] = category.type
@@ -88,7 +89,7 @@ def create_app(test_config=None):
   @app.route('/categories')
   def retrieve_categories():
     categories = Category.query.all()
-    categories_data= {}
+    categories_data = {}
     
     for category in categories:
       categories_data[category.id] = category.type
@@ -108,23 +109,23 @@ def create_app(test_config=None):
 
   @app.route('/categories/<int:category_id>/questions')
   def get_questions_by_categories(category_id):
-    category = Category.query.filter(Category.id == category_id).one_or_none()
-    selection = Question.query.filter(Question.category == category_id).all()
-    current_questions = paginate_questions(request, selection)
-    total_questions = len(selection)
-    
+    category = Category.query.filter_by(id = id).one_or_none()
+
     if category is None:
       print('error')
       abort(400)
+
+    selection = Question.query.filter_by(category = category.id).all()
+    current_questions = paginate_questions(request, selection)
+    # total_questions = len(selection)
     
-    else:
-      print('success')
-      return jsonify({
-        'success': True,
-        'question': current_questions,
-        'total_questions': total_questions,
-        'category': category.type
-      })
+    print('success')
+    return jsonify({
+      'success': True,
+      'questions': current_questions,
+      'total_questions': len(Question.query.all()),
+      'category': category.type
+    })
   #CATEGORIES IS NOT YET BEING CORECTLY CALLED FOR!
 
   #===================
