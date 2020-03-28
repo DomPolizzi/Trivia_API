@@ -131,21 +131,33 @@ def create_app(test_config=None):
   #===================
   #===== Quizzes =====
   #===================
-  '''
-  @app.route('/quizzes')
+  
+  @app.route('/quizzes', methods=['POST'])
   def get_quizes():
-    selection = Category.query.all()
-    categiry_data = {}
+    
+    body = request.get_json()
+    category_data = body.get('quiz_category')
+    previous = body.get('previous_questions')
 
-   if len(categories_data) == 0:
-      abort(404)
+    if ((category_data is None) or (previous is None)):
+      abort(400)
+
+    if category_data['id'] == 0:
+      questions = Question.query.all()
+    
+    else:
+      questions = Question.query.filter_by(category=category_data['id']).all()
+  
+
+    def get_random_question():
+      return questions[random.randrange(0,len(questions), 1)]
+
+    question = get_random_question()
 
     return jsonify({
       'success': True,
-      'categories': categories_data
+      'question': question.format()
     })
-  '''
-  # SIDE NOTE: Enabling breaks, Quizzes needs to call from categories
 
   #----------------------------
   # POST Requests for Questions
@@ -201,39 +213,6 @@ def create_app(test_config=None):
       print('abort')
       abort(422)
 
-  #-------------
-  #Patch Request
-  #-------------
-  '''  
-  @app.route('/questions/<int:question_id>', methods=['PATCH'])
-  def update_question(question_id):
-
-    body = request.get_json()
-
-    try:
-      question = Question.query.filter(Question.id == question_id).one_or_none()
-      if question is None:
-        abort(404)
-
-      if 'category' in body:
-        question.category = int(body.get('category'))
-
-      if 'difficulty' in body:
-        question.category = int(body.get('difficulty'))
-
-      if 'answer' in body:
-        question.category = int(body.get('answer'))
-
-      question.update()
-
-      return jsonify({
-        'success': True,
-        'id': question.id
-      })
-
-    except:
-      abort(400)
-  '''
   #-------------
   #DELETE Question
   #-------------
@@ -307,47 +286,6 @@ def create_app(test_config=None):
 #===========================
 # TO DOS
 #===========================
-'''
-
-  @TODO: 
-  Create an endpoint to handle GET requests 
-  for all available categories.
-  
-'''
-
-'''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
-
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
- 
-'''
-
-'''
-
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
-
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
-'''
-
-'''
-  @TODO: 
-  Create an endpoint to POST a new question, 
-  which will require the question and answer text, 
-  category, and difficulty score.
-
-  TEST: When you submit a question on the "Add" tab, 
-  the form will clear and the question will appear at the end of the last page
-  of the questions list in the "List" tab.  
-'''
 
 '''
   @TODO: 
@@ -358,15 +296,6 @@ def create_app(test_config=None):
   TEST: Search by any phrase. The questions list will update to include 
   only question that include that string within their question. 
   Try using the word "title" to start. 
-'''
-
-'''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
-
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
 '''
 
 '''
