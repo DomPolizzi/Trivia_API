@@ -160,7 +160,7 @@ def create_app(test_config=None):
     })
 
   #----------------------------
-  # POST Requests for Questions
+  # POST Requests for Questions & Search
   #----------------------------
 
   @app.route('/questions', methods=['POST'])
@@ -173,18 +173,19 @@ def create_app(test_config=None):
     new_answer = body.get('answer', None)
     new_category = body.get('category', None)
     new_difficulty = body.get('difficulty', None)
-    search = body.get('search', None)
+    search = body.get('searchTerm', None)
 
     try:
       if search:
-        selection = Question.query.order_by(Question.id).filter(Question.title.ilite('%{}%'.format(search)))
+        search_term = body.get('searchTerm')
+        selection = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
         current_questions = paginate_questions(request, selection)
 
        
         return jsonify({
           'success': True,
           'questions': current_questions,
-          'total_questions': len(selection.all())
+          'total_questions': len(Question.query.all())
         })
 
       else:
@@ -281,31 +282,3 @@ def create_app(test_config=None):
     }), 405
 
   return app
-
-
-#===========================
-# TO DOS
-#===========================
-
-'''
-  @TODO: 
-  Create a POST endpoint to get questions based on a search term. 
-  It should return any questions for whom the search term 
-  is a substring of the question. 
-
-  TEST: Search by any phrase. The questions list will update to include 
-  only question that include that string within their question. 
-  Try using the word "title" to start. 
-'''
-
-'''
-  @TODO: 
-  Create a POST endpoint to get questions to play the quiz. 
-  This endpoint should take category and previous question parameters 
-  and return a random questions within the given category, 
-  if provided, and that is not one of the previous questions. 
-
-  TEST: In the "Play" tab, after a user selects "All" or a category,
-  one question at a time is displayed, the user is allowed to answer
-  and shown whether they were correct or not. 
-'''
