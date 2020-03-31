@@ -15,14 +15,15 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        self.database_path = "postgres://{}/{}".format('localhost:5432', self.database_name)
+        self.database_path = "postgres://{}/{}".format(
+            'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         self.new_question = {
-            'question' : 'What color is the sky',
-            'answer' : 'Mostly Blue',
-            'category' : 'Trick Question',
-            'difficulty' : "4"
+            'question': 'What color is the sky',
+            'answer': 'Mostly Blue',
+            'category': 2,
+            'difficulty': '4'
         }
 
         # binds the app to the current context
@@ -31,16 +32,15 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-    
+
     def tearDown(self):
         """Executed after reach test"""
         pass
 
-
     def test_get_paginated_questions(self):
         res = self.client().get('/questions')
         data = json.loads(res.data)
-        
+
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
@@ -59,54 +59,62 @@ class TriviaTestCase(unittest.TestCase):
                             category=self.new_question['category'], difficulty=self.new_question['difficulty'])
         question.insert()
         question_id = question.id
+        q_before = Question.query.all()
+
         res = self.client().delete('/questions/{}'.format(question_id))
         data = json.loads(res.data)
-         
+
+        q_after = Question.query.all()
+
+        question = Question.query.filter(Question.id == 1).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 1)
-        self.assertTrue(data['total_questins'])
-        self.assertTrue(len(data['questions']))
+        self.assertEqual(data['deleted'], question_id)
+        self.assertTrue(len(q_before) - len(q_after) == 1)
         self.assertEqual(question, None)
 
+    def test_create_new_question(self):
 
-'''  
-    def test_update_question_difficulty(self):
-        res = self.client().patch('/questions/4', json={'difficulty': 4})
+        q_before = Question.query.all()
+
+        res = self.client().post('/questions', json=self.new_question)
         data = json.loads(res.data)
-        question = Question.query.filter(Question.id == 4).one_or_none()
-        
+
+        q_after = Question.query.all()
+
+        question = Question.query.filter(
+            Question.id == data['created']).one_or_none()
+
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['difficulty'], '2')
+        self.assertTrue(len(q_after) - len(q_before) == 1)
+        self.assertIsNotNone(question)
 
-    def test_400_for_failed_update(self):
-        res = self.client().patch('/questions/4')
+    def test_422_if_book_creation_fails(self):
+
+        q_before = Question.query.all()
+
+        res = self.client().post('/questions', json={})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 400)
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'bad request')
-
-    def test_422_if_question_does_not_exist(self):
-        res = self.client().patch('/questions/5000')
-        data = json.loads(res.data)
+        q_after = Question.query.all()
 
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'unprocessable')
+        self.assertTrue(len(q_after) == len(q_before))
 
-    def test_create_new_question(self):
-        res = self.client().post('/questions', json=self.new_question)
-        data = json.loads(res.data)
-        pass
+    def test_search_questions(self):
 
-    def test_422_if_book_creation_fails(self):
-        res = self.client().post('/questions', json=self.new_question)
+        res = self.client().post('/questions',  json={'searchTerm': 'what'})
         data = json.loads(res.data)
-        pass
-'''
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['questions']), 10)
+        self.assertEqual(data['questions'][0]['id'], 9)
+
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
