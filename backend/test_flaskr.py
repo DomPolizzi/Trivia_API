@@ -52,7 +52,7 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'resource not found')
+        self.assertEqual(data['message'], 'not found')
 
     def test_delete_question(self):
         question = Question(question=self.new_question['question'], answer=self.new_question['answer'],

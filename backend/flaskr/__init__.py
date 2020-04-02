@@ -92,7 +92,6 @@ def create_app(test_config=None):
             categories_data[category.id] = category.type
 
         if len(categories_data) == 0:
-            print('error in Categories: ')
             abort(404)
 
         return jsonify({
@@ -109,13 +108,11 @@ def create_app(test_config=None):
         category = Category.query.filter_by(id=id).one_or_none()
 
         if category is None:
-            print('error')
             abort(400)
 
         selection = Question.query.filter_by(category=category.id).all()
         current_questions = paginate_questions(request, selection)
 
-        print('success')
         return jsonify({
             'success': True,
             'questions': current_questions,
@@ -163,8 +160,6 @@ def create_app(test_config=None):
     def create_question():
 
         body = request.get_json()
-        print('body', body)
-
         new_question = body.get('question', None)
         new_answer = body.get('answer', None)
         new_category = body.get('category', None)
@@ -191,25 +186,19 @@ def create_app(test_config=None):
 
                 selection = Question.query.order_by(Question.id).all()
                 current_questions = paginate_questions(request, selection)
-                print('here2')
                 created_id = question.id
 
                 total_questions = len(Question.query.all())
 
-                print("Current questions", current_questions,
-                      type(current_questions))
-                print("Total questions", total_questions, type(total_questions))
-                print("Created ID",  created_id, type(created_id))
-
                 return jsonify({
                     "success": True,
                     "created": created_id,
+                    "question_created": question.question,
                     "questions": current_questions,
                     "total_questions": total_questions
                 })
 
         except:
-            print('abort')
             abort(422)
 
     # -------------
