@@ -91,19 +91,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(q_after) - len(q_before) == 1)
         self.assertIsNotNone(question)
 
-    def test_422_if_book_creation_fails(self):
-
-        q_before = Question.query.all()
-
-        res = self.client().post('/questions', json={})
-        data = json.loads(res.data)
-
-        q_after = Question.query.all()
-
-        self.assertEqual(res.status_code, 422)
-        self.assertEqual(data['success'], False)
-        self.assertTrue(len(q_after) == len(q_before))
-
     def test_search_questions(self):
 
         res = self.client().post('/questions',  json={'searchTerm': 'what'})

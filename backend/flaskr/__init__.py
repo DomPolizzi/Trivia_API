@@ -193,6 +193,7 @@ def create_app(test_config=None):
                 return jsonify({
                     "success": True,
                     "created": created_id,
+                    "question_created": question.question,
                     "questions": current_questions,
                     "total_questions": total_questions
                 })

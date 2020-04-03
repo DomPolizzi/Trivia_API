@@ -11,7 +11,7 @@ That's where you come in! Help them finish the trivia app so they can start hold
 3) Add questions and require that they include question and answer text.
 4) Search for questions based on a text query string.
 5) Play the quiz game, randomizing either all questions or within a specific category. 
-
+p
 
 # Full Stack Trivia API Backend
 
@@ -72,7 +72,7 @@ To run the tests, in the `/backend` folder, run:
 dropdb trivia_test
 createdb trivia_test
 psql trivia_test < trivia.psql
-python test_flaskr.py
+python3 test_flaskr.py
 ```
 
 ##### Key Dependencies
