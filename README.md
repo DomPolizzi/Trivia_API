@@ -1,19 +1,25 @@
-# Full Stack API Final Project
+# Full Stack Trivia
 
 ## Full Stack Trivia
 
-Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a  webpage to manage the trivia app and play the game, but their API experience is limited and still needs to be built out. 
+This is a project executed for the Udacity Full stack Nanodegree. A trivia game made running off python/ SQL alchemy and React JS.
 
-That's where you come in! Help them finish the trivia app so they can start holding trivia and seeing who's the most knowledgeable of the bunch. The application must:
 
 1) Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer. 
 2) Delete questions.
 3) Add questions and require that they include question and answer text.
 4) Search for questions based on a text query string.
 5) Play the quiz game, randomizing either all questions or within a specific category. 
-p
 
-# Full Stack Trivia API Backend
+
+
+## Lets Get Started
+
+### Installing Dependencies:
+
+You will need Python 3, Pip, Postgres and npm installed in order to run this application.
+
+### Backend
 
 #### PIP Dependencies
 
@@ -25,16 +31,14 @@ pip install -r requirements.txt
 
 This will install all of the required packages we selected within the `requirements.txt` file.
 
-## Database Setup
+#### Database Setup and running the server
 
-With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
+With Postgres running, restore a database using the trivia.psql file provided. From the `/backend` folder in terminal run:
 ```bash
 psql trivia < trivia.psql
 ```
 
-## Running the server
-
-From within the `backend` directory first ensure you are working using your created virtual environment.
+From within the `/backend` directory first ensure you are working using your created virtual environment.
 
 To run the server, execute:
 
@@ -44,7 +48,7 @@ export FLASK_ENV=development
 flask run
 ```
 
-# Full Stack Trivia API  Frontend
+### Frontend
 
 #### Installing project dependencies
 
@@ -74,6 +78,11 @@ createdb trivia_test
 psql trivia_test < trivia.psql
 python3 test_flaskr.py
 ```
+
+
+## API reference
+
+
 
 ##### Key Dependencies
 
