@@ -93,9 +93,9 @@ python3 test_flaskr.py
 
 * General : returns a list of questions.
 * Sample : `curl http://127.0.0.1:5000/questions`
-
+```bash
 {
-     "categories": {
+    "categories": {
         "1": "Science", 
         "2": "Art", 
         "3": "Geography", 
@@ -178,23 +178,25 @@ python3 test_flaskr.py
     "success": true, 
     "total_questions": 9
 }
+```
 
 ##### GET /categories
 
 * General : returns a list of categories.
 * Sample : `curl http://127.0.0.1:5000/categories`
-
-    {
-    "categories": {
-        "1": "Science", 
-        "2": "Art", 
-        "3": "Geography", 
-        "4": "History", 
-        "5": "Entertainment", 
-        "6": "Sports"
-    }, 
-    "success": true
-    }
+```bash
+{
+"categories": {
+    "1": "Science", 
+    "2": "Art", 
+    "3": "Geography", 
+    "4": "History", 
+    "5": "Entertainment", 
+    "6": "Sports"
+}, 
+"success": true
+}
+```
 
 ##### POST /questions
 
@@ -205,24 +207,104 @@ python3 test_flaskr.py
             "difficulty": 4,
             "category": "1"
         }'`
+```bash
+{
+  "created": 105, 
+  "question_created": "Who created Linux?", 
+  "questions": [
+    {
+      "answer": "Apollo 13", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 2, 
+      "question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?"
+    }, 
+    {
+      "answer": "Tom Cruise", 
+      "category": 5, 
+      "difficulty": 4, 
+      "id": 4, 
+      "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
+    }, 
+    {
+      "answer": "Maya Angelou", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 5, 
+      "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"
+    }, 
+    {
+      "answer": "Muhammad Ali", 
+      "category": 4, 
+      "difficulty": 1, 
+      "id": 9, 
+      "question": "What boxer's original name is Cassius Clay?"
+    }, 
+    {
+      "answer": "Brazil", 
+      "category": 6, 
+      "difficulty": 3, 
+      "id": 10, 
+      "question": "Which is the only team to play in every soccer World Cup tournament?"
+    }, 
+    {
+      "answer": "Uruguay", 
+      "category": 6, 
+      "difficulty": 4, 
+      "id": 11, 
+      "question": "Which country won the first ever soccer World Cup in 1930?"
+    }, 
+    {
+      "answer": "George Washington Carver", 
+      "category": 4, 
+      "difficulty": 2, 
+      "id": 12, 
+      "question": "Who invented Peanut Butter?"
+    }, 
+    {
+      "answer": "Lake Victoria", 
+      "category": 3, 
+      "difficulty": 2, 
+      "id": 13, 
+      "question": "What is the largest lake in Africa?"
+    }, 
+    {
+      "answer": "The Palace of Versailles", 
+      "category": 3, 
+      "difficulty": 3, 
+      "id": 14, 
+      "question": "In which royal palace would you find the Hall of Mirrors?"
+    }, 
+    {
+      "answer": "Escher", 
+      "category": 2, 
+      "difficulty": 1, 
+      "id": 16, 
+      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+    }
+  ], 
+  "success": true, 
+  "total_questions": 72
+}
+```
 
 ##### DELETE /questions/<int:id>/
 
 * General : Deletes a question
 * Sample : `curl http://127.0.0.1:5000/questions/15 -X DELETE`
-
-    }
-        "success": true, 
-        "total_questions": 9
-    }
-
+```bash
+}
+    "success": true, 
+    "total_questions": 9
+}
+```
 
 ##### POST /quizes
 
 * General : Allow users to play a quiz game based on a category
 * Sample : `curl http://127.0.0.1:5000/quizzes -X POST -H "Content-Type: application/json" -d '{"previous_questions": [7,8],
                                             "quiz_category": {"type": "Sports", "id": "6"}}'`
-
+```bash
 {
     "question": {
         "answer": "Brazil", 
@@ -233,6 +315,7 @@ python3 test_flaskr.py
     }, 
     "success": true
 }
+```
 
 ##### Key Dependencies
 
